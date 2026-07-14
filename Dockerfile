@@ -16,6 +16,6 @@ COPY railway-apache-start.sh /usr/local/bin/railway-apache-start.sh
 RUN sed -i 's/\r$//' /usr/local/bin/railway-apache-start.sh \
     && chmod +x /usr/local/bin/railway-apache-start.sh
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["railway-apache-start.sh"]
