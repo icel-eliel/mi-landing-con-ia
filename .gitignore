@@ -4,3 +4,7 @@ Thumbs.db
 
 # Editor files
 .vscode/
+ 
+# Environment files
+.env
+.env.local
