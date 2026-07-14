@@ -18,7 +18,7 @@ Landing page PHP para demo de despliegue con login, dashboard basico y conexion 
 4. Ejecuta el contenido de `database/schema.sql` en la base MySQL de Railway.
 5. Despliega nuevamente el servicio web.
 
-El contenedor usa la variable `PORT` que Railway asigna automaticamente al iniciar. No hace falta configurarla manualmente.
+El contenedor escucha en el puerto `8080` usando el servidor integrado de PHP. No necesita Apache ni una variable `PORT` manual.
 
 ## Credenciales demo
 
