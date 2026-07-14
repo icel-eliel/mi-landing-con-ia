@@ -3,8 +3,9 @@ FROM php:8.2-apache
 # Instalar extensiones de PDO y MySQL
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Habilitar mod_rewrite de Apache si es necesario
-RUN a2enmod rewrite
+# Usar un solo MPM de Apache. php:apache funciona con mpm_prefork.
+RUN a2dismod mpm_event mpm_worker || true \
+    && a2enmod mpm_prefork rewrite
 
 # Railway puede omitir el CMD si hay un Start Command personalizado.
 # Dejamos Apache listo en 8080 desde la imagen para evitar $PORT literal.
