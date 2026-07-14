@@ -6,6 +6,12 @@ RUN docker-php-ext-install pdo pdo_mysql
 # Habilitar mod_rewrite de Apache si es necesario
 RUN a2enmod rewrite
 
+# Railway puede omitir el CMD si hay un Start Command personalizado.
+# Dejamos Apache listo en 8080 desde la imagen para evitar $PORT literal.
+RUN sed -i 's/^Listen .*/Listen 8080/' /etc/apache2/ports.conf \
+    && sed -i 's/<VirtualHost \*:80>/<VirtualHost *:8080>/' /etc/apache2/sites-available/000-default.conf \
+    && echo 'ServerName localhost' >> /etc/apache2/apache2.conf
+
 # Copiar archivos del proyecto al directorio publico de Apache
 COPY . /var/www/html/
 
@@ -18,4 +24,4 @@ RUN sed -i 's/\r$//' /usr/local/bin/railway-apache-start.sh \
 
 EXPOSE 8080
 
-CMD ["railway-apache-start.sh"]
+CMD ["apache2-foreground"]
