@@ -1,11 +1,11 @@
-FROM php:8.2-apache
+FROM php:8.2-cli
 
 RUN docker-php-ext-install pdo pdo_mysql
 
 COPY . /var/www/html
 
-RUN chown -R www-data:www-data /var/www/html
+WORKDIR /var/www/html
 
 EXPOSE 80
 
-CMD ["apache2-foreground"]
+CMD php -S 0.0.0.0:$PORT -t .
