@@ -6,8 +6,7 @@ COPY . /var/www/html
 
 WORKDIR /var/www/html
 
-RUN chmod +x /var/www/html/start.sh
-
 EXPOSE 80
 
-ENTRYPOINT ["/bin/sh", "-c", "/var/www/html/start.sh"]
+# Usamos la sintaxis de shell de CMD para que se ejecute bajo /bin/sh y expanda $PORT automáticamente
+CMD php -S 0.0.0.0:$PORT -t .
