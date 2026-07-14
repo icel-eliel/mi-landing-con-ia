@@ -8,9 +8,36 @@ function getDbConnection(): PDO
     $host = getenv('DB_HOST') ?: 'hayabusa.proxy.rlwy.net';
     $port = getenv('DB_PORT') ?: '49731';
     $dbname = getenv('DB_NAME') ?: 'railway';
-    $user = getenv('DB_USERNAME') ?: 'root';
-    $pass = getenv('DB_PASSWORD') ?: 'rmpsuVFTCDpTLOlglpaGcZntxNRfepzd';
     $charset = 'utf8mb4';
+
+
+    // Leer variables con fallback entre convenciones comunes (DB_*, MYSQL_*, DATABASE_URL)
+    $host = getenv('DB_HOST') ?: getenv('MYSQLHOST') ?: getenv('MYSQL_HOST') ?: null;
+    $port = getenv('DB_PORT') ?: getenv('MYSQLPORT') ?: getenv('MYSQL_PORT') ?: '3306';
+    $dbname = getenv('DB_NAME') ?: getenv('MYSQLDATABASE') ?: getenv('MYSQL_DATABASE') ?: 'cafe_eliel';
+    $user = getenv('DB_USERNAME') ?: getenv('MYSQLUSER') ?: getenv('MYSQL_USER') ?: 'root';
+    $pass = getenv('DB_PASSWORD') ?: getenv('MYSQLPASSWORD') ?: getenv('MYSQL_ROOT_PASSWORD') ?: '';
+    $charset = 'utf8mb4';
+
+    // Si el proveedor entrega una URL completa (ej. mysql://user:pass@host:port/db), parsearla
+    $full = getenv('MYSQL_URL') ?: getenv('DATABASE_URL') ?: null;
+    if ($full && !$host) {
+        $parts = parse_url($full);
+        if ($parts) {
+            $host = $parts['host'] ?? $host;
+            $port = $parts['port'] ?? $port;
+            $user = $parts['user'] ?? $user;
+            $pass = $parts['pass'] ?? $pass;
+            $path = $parts['path'] ?? null;
+            if ($path) {
+                $dbname = ltrim($path, '/');
+            }
+        }
+    }
+
+    if (!$host || !$dbname || !$user) {
+        throw new RuntimeException('Faltan credenciales de BD en las variables de entorno.');
+    }
 
     $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
     $options = [
@@ -19,7 +46,12 @@ function getDbConnection(): PDO
         PDO::ATTR_EMULATE_PREPARES => false,
     ];
 
-    return new PDO($dsn, $user, $pass, $options);
+    try {
+        return new PDO($dsn, $user, $pass, $options);
+    } catch (PDOException $e) {
+        error_log('DB connect error: ' . $e->getMessage());
+        throw new RuntimeException('No fue posible conectar con la base de datos.');
+    }
 }
 
 function isLoggedIn(): bool
