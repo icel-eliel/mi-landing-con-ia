@@ -8,4 +8,4 @@ WORKDIR /var/www/html
 
 EXPOSE 80
 
-CMD php -S 0.0.0.0:$PORT -t .
+CMD ["/bin/sh", "-c", "php -S 0.0.0.0:$PORT -t ."]
