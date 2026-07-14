@@ -5,11 +5,11 @@ define('APP_ROOT', __DIR__);
 
 function getDbConnection(): PDO
 {
-    $host = getenv('DB_HOST') ?: 'localhost';
-    $port = getenv('DB_PORT') ?: '3306';
-    $dbname = getenv('DB_NAME') ?: 'cafe_eliel';
+    $host = getenv('DB_HOST') ?: 'hayabusa.proxy.rlwy.net';
+    $port = getenv('DB_PORT') ?: '49731';
+    $dbname = getenv('DB_NAME') ?: 'railway';
     $user = getenv('DB_USERNAME') ?: 'root';
-    $pass = getenv('DB_PASSWORD') ?: '';
+    $pass = getenv('DB_PASSWORD') ?: 'rmpsuVFTCDpTLOlglpaGcZntxNRfepzd';
     $charset = 'utf8mb4';
 
     $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";

@@ -112,6 +112,21 @@
             <p><strong>Horario:</strong> Lunes a Sábado · 7:00 - 22:00</p>
             <p><strong>Teléfono:</strong> +57 300 123 4567</p>
           </div>
+
+           <form id="formulario-contacto" class="formulario-contacto">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" name="nombre" placeholder="Tu nombre">
+
+            <label for="correo">Correo electronico</label>
+            <input type="email" id="correo" name="correo" placeholder="tu@email.com">
+
+            <label for="mensaje">Mensaje</label>
+            <textarea id="mensaje" name="mensaje" rows="5" placeholder="Escribe tu mensaje"></textarea>
+
+            <button type="submit">Solicitar informacion</button>
+
+            <p id="mensaje-respuesta" class="mensaje-respuesta"></p>
+        </form>
         </div>
       </section>
     </main>
