@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/auth.php';
 
 define('APP_ROOT', __DIR__);
 
