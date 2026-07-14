@@ -6,6 +6,8 @@ COPY . /var/www/html
 
 WORKDIR /var/www/html
 
+RUN chmod +x /var/www/html/start.sh
+
 EXPOSE 80
 
-CMD ["/bin/sh", "-c", "php -S 0.0.0.0:$PORT -t ."]
+CMD ["/bin/sh", "-c", "./start.sh"]
