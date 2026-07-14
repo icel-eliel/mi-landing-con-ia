@@ -6,6 +6,7 @@ $messageType = 'success';
 
 try {
     $pdo = getDbConnection();
+    ensureDemoData($pdo);
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $action = $_POST['action'] ?? '';

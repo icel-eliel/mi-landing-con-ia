@@ -17,6 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         try {
             $pdo = getDbConnection();
+            ensureDemoData($pdo);
             $stmt = $pdo->prepare('SELECT id, first_name, last_name, email, role, password_hash FROM users WHERE email = ? LIMIT 1');
             $stmt->execute([$email]);
             $user = $stmt->fetch();
