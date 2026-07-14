@@ -77,7 +77,7 @@ try {
     $recentSalesStmt = $pdo->prepare('SELECT customer_name, description, total_amount, created_at FROM sales WHERE sale_date = ? ORDER BY created_at DESC LIMIT 8');
     $recentSalesStmt->execute([$today]);
     $recentSales = $recentSalesStmt->fetchAll();
-} catch (PDOException $e) {
+} catch (Throwable $e) {
     $message = 'No fue posible cargar el dashboard.';
     $messageType = 'error';
     $users = [];

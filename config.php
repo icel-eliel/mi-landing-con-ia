@@ -5,41 +5,48 @@ define('APP_ROOT', __DIR__);
 
 function getDbConnection(): PDO
 {
-    $host = getenv('DB_HOST') ?: 'hayabusa.proxy.rlwy.net';
-    $port = getenv('DB_PORT') ?: '49731';
-    $dbname = getenv('DB_NAME') ?: 'railway';
-    $charset = 'utf8mb4';
+    $databaseUrl = getenv('MYSQL_URL') ?: getenv('DATABASE_URL') ?: '';
+    $parsedUrl = $databaseUrl !== '' ? parse_url($databaseUrl) : [];
+    $parts = is_array($parsedUrl) ? $parsedUrl : [];
 
+    $host = getenv('DB_HOST')
+        ?: getenv('MYSQLHOST')
+        ?: getenv('MYSQL_HOST')
+        ?: ($parts['host'] ?? 'localhost');
 
-    // Leer variables con fallback entre convenciones comunes (DB_*, MYSQL_*, DATABASE_URL)
-    $host = getenv('DB_HOST') ?: getenv('MYSQLHOST') ?: getenv('MYSQL_HOST') ?: null;
-    $port = getenv('DB_PORT') ?: getenv('MYSQLPORT') ?: getenv('MYSQL_PORT') ?: '3306';
-    $dbname = getenv('DB_NAME') ?: getenv('MYSQLDATABASE') ?: getenv('MYSQL_DATABASE') ?: 'cafe_eliel';
-    $user = getenv('DB_USERNAME') ?: getenv('MYSQLUSER') ?: getenv('MYSQL_USER') ?: 'root';
-    $pass = getenv('DB_PASSWORD') ?: getenv('MYSQLPASSWORD') ?: getenv('MYSQL_ROOT_PASSWORD') ?: '';
-    $charset = 'utf8mb4';
+    $port = getenv('DB_PORT')
+        ?: getenv('MYSQLPORT')
+        ?: getenv('MYSQL_PORT')
+        ?: ($parts['port'] ?? '3306');
 
-    // Si el proveedor entrega una URL completa (ej. mysql://user:pass@host:port/db), parsearla
-    $full = getenv('MYSQL_URL') ?: getenv('DATABASE_URL') ?: null;
-    if ($full && !$host) {
-        $parts = parse_url($full);
-        if ($parts) {
-            $host = $parts['host'] ?? $host;
-            $port = $parts['port'] ?? $port;
-            $user = $parts['user'] ?? $user;
-            $pass = $parts['pass'] ?? $pass;
-            $path = $parts['path'] ?? null;
-            if ($path) {
-                $dbname = ltrim($path, '/');
-            }
-        }
-    }
+    $dbname = getenv('DB_NAME')
+        ?: getenv('MYSQLDATABASE')
+        ?: getenv('MYSQL_DATABASE')
+        ?: (isset($parts['path']) ? ltrim($parts['path'], '/') : 'cafe_eliel');
+
+    $user = getenv('DB_USERNAME')
+        ?: getenv('DB_USER')
+        ?: getenv('MYSQLUSER')
+        ?: getenv('MYSQL_USER')
+        ?: ($parts['user'] ?? 'root');
+
+    $pass = getenv('DB_PASSWORD')
+        ?: getenv('MYSQLPASSWORD')
+        ?: getenv('MYSQL_PASSWORD')
+        ?: getenv('MYSQL_ROOT_PASSWORD')
+        ?: ($parts['pass'] ?? '');
 
     if (!$host || !$dbname || !$user) {
         throw new RuntimeException('Faltan credenciales de BD en las variables de entorno.');
     }
 
-    $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
+    $dsn = sprintf(
+        'mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4',
+        urldecode((string) $host),
+        urldecode((string) $port),
+        urldecode((string) $dbname)
+    );
+
     $options = [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -47,56 +54,9 @@ function getDbConnection(): PDO
     ];
 
     try {
-        return new PDO($dsn, $user, $pass, $options);
+        return new PDO($dsn, urldecode((string) $user), urldecode((string) $pass), $options);
     } catch (PDOException $e) {
         error_log('DB connect error: ' . $e->getMessage());
-        throw new RuntimeException('No fue posible conectar con la base de datos.');
+        throw new RuntimeException('No fue posible conectar con la base de datos.', 0, $e);
     }
-}
-
-function isLoggedIn(): bool
-{
-    return !empty($_SESSION['user_id']);
-}
-
-function isAdmin(): bool
-{
-    return isLoggedIn() && ($_SESSION['role'] ?? '') === 'admin';
-}
-
-function requireAuth(?string $requiredRole = null): void
-{
-    if (!isLoggedIn()) {
-        header('Location: login.php');
-        exit;
-    }
-
-    if ($requiredRole === 'admin' && !isAdmin()) {
-        header('Location: index.php');
-        exit;
-    }
-}
-
-function getDisplayName(): string
-{
-    $name = trim($_GET['name'] ?? '');
-
-    if ($name !== '') {
-        return htmlspecialchars($name, ENT_QUOTES, 'UTF-8');
-    }
-
-    return isset($_SESSION['first_name'])
-        ? htmlspecialchars($_SESSION['first_name'], ENT_QUOTES, 'UTF-8')
-        : 'visitante';
-}
-
-function verifyPassword(string $password, string $storedHash): bool
-{
-    $info = password_get_info($storedHash);
-
-    if (($info['algo'] ?? null) !== 0) {
-        return password_verify($password, $storedHash);
-    }
-
-    return hash_equals($storedHash, $password);
 }

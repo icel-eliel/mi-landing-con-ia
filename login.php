@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $errorMessage = 'Correo o contraseña incorrectos.';
-        } catch (PDOException $e) {
+        } catch (Throwable $e) {
             $errorMessage = 'No fue posible conectar con la base de datos.';
         }
     }
