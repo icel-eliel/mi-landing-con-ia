@@ -10,4 +10,4 @@ RUN chmod +x /var/www/html/start.sh
 
 EXPOSE 80
 
-ENTRYPOINT ["/bin/sh", "-c", "./start.sh"]
+ENTRYPOINT ["./start.sh"]

@@ -1,1 +1,1 @@
-web: /bin/sh -lc "./start.sh"
+web: ./start.sh
